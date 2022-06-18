@@ -31,9 +31,11 @@ train_dataset = Dataset.from_dict(train_data)
 test_dataset = Dataset.from_dict(test_data)
 
 # Train the bi-encoder model
-model_name = 'distilbert-base-uncased'
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-bi_encoder = AutoModel.from_pretrained(model_name)
+text_model_name = 'distilbert-base-uncased'
+entity_model_name = 'distilbert-base-uncased'
+tokenizer = AutoTokenizer.from_pretrained(text_model_name)
+text_encoder = AutoModel.from_pretrained(text_model_name)
+entity_encoder = AutoModel.from_pretrained(entity_model_name)
 
 def tokenize_data(example):
     input_text = example['input_text']
@@ -58,14 +60,14 @@ training_args = TrainingArguments(
     learning_rate=5e-5,
 )
 
-def compute_loss(model, inputs, return_outputs=False):
+def compute_loss(text_encoder, entity_encoder, inputs, return_outputs=False):
     input_ids = inputs.pop("input_ids")
     attention_mask = inputs.pop("attention_mask")
     entity_ids = inputs.pop("entity_ids")
     entity_attention_mask = inputs.pop("entity_attention_mask")
 
-    input_outputs = model(input_ids, attention_mask=attention_mask)
-    entity_outputs = model(entity_ids, attention_mask=entity_attention_mask)
+    input_outputs = text_encoder(input_ids, attention_mask=attention_mask)
+    entity_outputs = entity_encoder(entity_ids, attention_mask=entity_attention_mask)
 
     similarities = (input_outputs[0] * entity_outputs[0]).sum(dim=1)
     loss = -similarities.mean()
@@ -75,7 +77,7 @@ def compute_loss(model, inputs, return_outputs=False):
     return loss
 
 trainer = Trainer(
-    model=bi_encoder,
+    model=(text_encoder, entity_encoder),
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=test_dataset,
@@ -86,5 +88,6 @@ trainer = Trainer(
 trainer.train()
 
 # Save and test the model
-bi_encoder.save_pretrained("bi_encoder_output")
-tokenizer.save_pretrained("bi_encoder_output")
+text_encoder.save_pretrained("bi_encoder_output/text_encoder")
+entity_encoder.save_pretrained("bi_encoder_output/entity_encoder")
+tokenizer.save_pretrained("bi_encoder_output/tokenizer")
