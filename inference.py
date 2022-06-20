@@ -1,6 +1,7 @@
 import json
 import torch
 import faiss
+import argparse
 from transformers import AutoTokenizer, AutoModel
 
 # Load the JSON data
@@ -32,16 +33,21 @@ def embed_text(text, tokenizer, text_encoder):
 def search_nearest_entities(text, tokenizer, text_encoder, index, data, k=5):
     text_embeddings = embed_text(text, tokenizer, text_encoder)
     faiss.normalize_L2(text_embeddings.numpy())
-    _, indices = index.search(text_embeddings.numpy(), k)
+    scores, indices = index.search(text_embeddings.numpy(), k)
 
-    nearest_entities = [data[i]['entity'] for i in indices[0]]
+    nearest_entities = [(data[i]['entity'], score) for i, score in zip(indices[0], scores[0])]
 
     return nearest_entities
 
-input_text = "Nobel Prize-winning physicist who developed the theory of general relativity."
+# Read text from the command line
+parser = argparse.ArgumentParser(description='Retrieve nearest entities for a given text.')
+parser.add_argument('text', type=str, help='Text to retrieve nearest entities for')
+args = parser.parse_args()
+input_text = args.text
+
 nearest_entities = search_nearest_entities(input_text, tokenizer, text_encoder, index, data)
 
-# Print the nearest entity names
+# Print the nearest entity names and scores
 print("Nearest Entities:")
-for entity in nearest_entities:
-    print(f"- {entity}")
+for entity, score in nearest_entities:
+    print(f"- {entity} (score: {score:.4f})")
