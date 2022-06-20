@@ -1,5 +1,6 @@
 import json
 import torch
+import faiss
 from transformers import AutoTokenizer, AutoModel
 
 # Load the JSON data
@@ -34,3 +35,15 @@ entity_embeddings = generate_entity_embeddings(data, tokenizer, entity_encoder)
 
 # Save the generated embeddings to a torch file
 torch.save(entity_embeddings, 'entity_embeddings.pt')
+
+# Initialize the Faiss index
+index = faiss.IndexHNSWFlat(embedding_size, 32)
+index.hnsw.efConstruction = 40
+index.verbose = True
+
+# Add the embeddings to the Faiss index
+faiss.normalize_L2(entity_embeddings.numpy())
+index.add(entity_embeddings.numpy())
+
+# Save the Faiss index
+faiss.write_index(index, 'entity_embeddings_hnsw.faiss')
