@@ -2,16 +2,16 @@ import json
 import torch
 import faiss
 import argparse
-import configparser
+import yaml
 from transformers import AutoTokenizer, AutoModel
 
 
 def read_config(config_file):
-    config = configparser.ConfigParser()
-    config.read(config_file)
+    with open(config_file, 'r') as f:
+        config = yaml.safe_load(f)
     return config
 
-config_file = 'config.ini'
+config_file = 'config.yaml'
 config = read_config(config_file)
 
 # Load the JSON data
@@ -20,15 +20,15 @@ def load_json_data(file_path):
         data = json.load(f)
     return data
 
-file_path = config.get('data', 'file_path')
+file_path = config['data']['file_path']
 data = load_json_data(file_path)
 
 # Load the trained model, tokenizer, and Faiss index
-text_model_name = config.get('model', 'text_model_name')
+text_model_name = config['model']['text_model_name']
 tokenizer = AutoTokenizer.from_pretrained(text_model_name)
-text_encoder = AutoModel.from_pretrained(config.get('model', 'text_encoder_path'))
+text_encoder = AutoModel.from_pretrained(config['model']['text_encoder_path'])
 
-index = faiss.read_index(config.get('model', 'index_path'))
+index = faiss.read_index(config['model']['index_path'])
 
 # Define a function to preprocess and embed the input text
 def embed_text(text, tokenizer, text_encoder):

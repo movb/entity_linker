@@ -1,0 +1,9 @@
+data:
+  file_path: wikipedia/wikipedia_data.json
+
+model:
+  text_model_name: distilbert-base-uncased
+  entity_model_name: distilbert-base-uncased
+  text_encoder_path: bi_encoder_output/text_encoder
+  entity_encoder_path: bi_encoder_output/text_encoder
+  index_path: entity_embeddings_hnsw.faiss
