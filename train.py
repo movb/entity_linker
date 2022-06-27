@@ -3,13 +3,16 @@ from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer, AutoModel, TrainingArguments, DataCollatorWithPadding, Trainer
 from datasets import Dataset
 
+
+from .config import config
+
 # Load the JSON data
 def load_json_data(file_path):
     with open(file_path, 'r') as f:
         data = json.load(f)
     return data
 
-file_path = 'wikipedia/wikipedia_data.json'
+file_path = config['data']['file_path']
 data = load_json_data(file_path)
 
 # Preprocess the data
@@ -31,11 +34,12 @@ train_dataset = Dataset.from_dict(train_data)
 test_dataset = Dataset.from_dict(test_data)
 
 # Train the bi-encoder model
-text_model_name = 'distilbert-base-uncased'
-entity_model_name = 'distilbert-base-uncased'
+text_model_name = config['model']['text_model_name']
+entity_model_name = config['model']['entity_model_name']
 tokenizer = AutoTokenizer.from_pretrained(text_model_name)
 text_encoder = AutoModel.from_pretrained(text_model_name)
 entity_encoder = AutoModel.from_pretrained(entity_model_name)
+
 
 def tokenize_data(example):
     input_text = example['input_text']
@@ -88,6 +92,6 @@ trainer = Trainer(
 trainer.train()
 
 # Save and test the model
-text_encoder.save_pretrained("bi_encoder_output/text_encoder")
-entity_encoder.save_pretrained("bi_encoder_output/entity_encoder")
-tokenizer.save_pretrained("bi_encoder_output/tokenizer")
+text_encoder.save_pretrained(config['model']['text_encoder_path'])
+entity_encoder.save_pretrained(config['model']['entity_encoder_path'])
+tokenizer.save_pretrained(config['model']['tokenizer_path'])

@@ -2,17 +2,9 @@ import json
 import torch
 import faiss
 import argparse
-import yaml
 from transformers import AutoTokenizer, AutoModel
 
-
-def read_config(config_file):
-    with open(config_file, 'r') as f:
-        config = yaml.safe_load(f)
-    return config
-
-config_file = 'config.yaml'
-config = read_config(config_file)
+from .config import config
 
 # Load the JSON data
 def load_json_data(file_path):

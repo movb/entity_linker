@@ -3,19 +3,21 @@ import torch
 import faiss
 from transformers import AutoTokenizer, AutoModel
 
+from .config import config
+
 # Load the JSON data
 def load_json_data(file_path):
     with open(file_path, 'r') as f:
         data = json.load(f)
     return data
 
-file_path = 'wikipedia/wikipedia_data.json'
+file_path = config['data']['file_path']
 data = load_json_data(file_path)
 
 # Initialize the tokenizer and entity encoder
-entity_model_name = 'distilbert-base-uncased'
+entity_model_name = config['model']['entity_model_name']
 tokenizer = AutoTokenizer.from_pretrained(entity_model_name)
-entity_encoder = AutoModel.from_pretrained('bi_encoder_output/entity_encoder')
+entity_encoder = AutoModel.from_pretrained(config['model']['entity_encoder_path'])
 
 def generate_entity_embeddings(data, tokenizer, entity_encoder):
     entity_embeddings = []

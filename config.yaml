@@ -5,5 +5,6 @@ model:
   text_model_name: distilbert-base-uncased
   entity_model_name: distilbert-base-uncased
   text_encoder_path: bi_encoder_output/text_encoder
-  entity_encoder_path: bi_encoder_output/text_encoder
+  entity_encoder_path: bi_encoder_output/entity_encoder
+  tokenizer_path: bi_encoder_output/tokenizer
   index_path: entity_embeddings_hnsw.faiss
