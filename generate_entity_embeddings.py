@@ -39,6 +39,7 @@ entity_embeddings = generate_entity_embeddings(data, tokenizer, entity_encoder)
 torch.save(entity_embeddings, 'entity_embeddings.pt')
 
 # Initialize the Faiss index
+embedding_size = entity_embeddings.shape[1]
 index = faiss.IndexHNSWFlat(embedding_size, 32)
 index.hnsw.efConstruction = 40
 index.verbose = True
