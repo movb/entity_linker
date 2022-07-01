@@ -1,4 +1,4 @@
-# Bi-encocer entity linking model
+# Bi-encoder entity linking model
 
 Simple, but efficient model to retrieve entities in the given piece of text. The model uses BERT encoder for text and entities and fast HNSW index to retrieve nearest entities.
 
